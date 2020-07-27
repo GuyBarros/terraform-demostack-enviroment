@@ -42,29 +42,29 @@ output "Primary_Region" {
 }
 
 output "Primary_Consul" {
-  value = module.aws_cluster.consul_ui
+  value = module.aws_primarycluster.consul_ui
 }
 
 output "Primary_Nomad" {
-  value = module.aws_cluster.nomad_ui
+  value = module.aws_primarycluster.nomad_ui
 }
 
 output "Primary_Vault" {
-  value = module.aws_cluster.vault_ui
+  value = module.aws_primarycluster.vault_ui
 }
 
 output "Primary_Fabio" {
-  value = module.aws_cluster.fabio_lb
+  value = module.aws_primarycluster.fabio_lb
 }
 
 output "Primary_Traefik" {
-  value = module.aws_cluster.traefik_lb
+  value = module.aws_primarycluster.traefik_lb
 }
 
 output "Primary_servers_nodes" {
-  value = module.aws_cluster.servers
+  value = module.aws_primarycluster.servers
 }
 
 output "Primary_workers_Nodes" {
-  value = module.aws_cluster.workers
+  value = module.aws_primarycluster.workers
 }

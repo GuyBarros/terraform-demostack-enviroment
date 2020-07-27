@@ -13,19 +13,19 @@ terraform {
 }
 */
 
-module "tls"{
-source               = "git::https://github.com/GuyBarros/terraform-tls-certificate.git?ref=0.0.2"
-  validity_period_hours  = var.validity_period_hours
-  organization           = var.organization
-  is_ca_certificate      = var.is_ca_certificate
-  ecdsa_curve            = var.ecdsa_curve
-  common_name            = var.common_name
-  algorithm              = var.algorithm
+module "tls" {
+  source                = "git::https://github.com/GuyBarros/terraform-tls-certificate.git?ref=0.0.2"
+  validity_period_hours = var.validity_period_hours
+  organization          = var.organization
+  is_ca_certificate     = var.is_ca_certificate
+  ecdsa_curve           = var.ecdsa_curve
+  common_name           = var.common_name
+  algorithm             = var.algorithm
 }
 
 module "dns" {
-source               = "git::https://github.com/lhaig/terraform-dns-multicloud.git?ref=0.2.1"
- hosted-zone           = var.hosted-zone
+  source      = "git::https://github.com/lhaig/terraform-dns-multicloud.git?ref=0.2.1"
+  hosted-zone = var.hosted-zone
   # AWS_ACCESS_KEY_ID     = var.AWS_ACCESS_KEY_ID
   # AWS_SECRET_ACCESS_KEY = var.AWS_SECRET_ACCESS_KEY
   # ARM_SUBSCRIPTION_ID   = var.ARM_SUBSCRIPTION_ID
@@ -43,13 +43,25 @@ source               = "git::https://github.com/lhaig/terraform-dns-multicloud.g
   gcp_region            = var.gcp_region
 }
 
-module "aws_cluster" {
-       providers = {
-        aws = aws.demostack
-         }
-  depends_on           = [module.dns,module.tls]
-  // count                = var.count_aws_demostack
-  source               = "git::https://github.com/GuyBarros/terraform-aws-demostack.git//modules?ref=0.0.6"
+
+provider "aws" {
+  region  = var.primary_region
+  alias   = "primary"
+}
+
+provider "aws" {
+  region  = var.secondary_region
+  alias   = "secondary"
+}
+
+
+module "aws_primarycluster" {
+   providers = {
+    aws.demostack = aws.primary
+    aws           = aws.primary
+  }
+   depends_on = [module.dns.aws_route53_zone, module.tls]
+  source               = "git::https://github.com/GuyBarros/terraform-aws-demostack.git//modules?ref=0.0.7"
   owner                = var.owner
   region               = var.primary_region
   namespace            = var.primary_namespace
@@ -75,11 +87,11 @@ module "aws_cluster" {
   cidr_blocks          = var.cidr_blocks
   instance_type_server = var.instance_type_server
   instance_type_worker = var.instance_type_worker
-  # zone_id              = module.dns.aws_sub_zone_id[0]
-  zone_id              = "Z3ABWIDSN7J1TI"
-  run_nomad_jobs       = var.run_nomad_jobs
-  host_access_ip       = var.host_access_ip
-  primary_datacenter   = var.primary_namespace
+   zone_id            = try(module.dns.aws_sub_zone_id[0],"Z01021311ZI5MRJSE45JX")
+  #  zone_id            = module.dns.aws_route53_zone.aws_sub_zone.*.zone_id[0]
+  run_nomad_jobs        = var.run_nomad_jobs
+  host_access_ip        = var.host_access_ip
+  primary_datacenter    = var.primary_namespace
   ca_key_algorithm      = module.tls.ca_key_algorithm
   ca_private_key_pem    = module.tls.ca_private_key_pem
   ca_cert_pem           = module.tls.ca_cert_pem
