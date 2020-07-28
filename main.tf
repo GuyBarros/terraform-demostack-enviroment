@@ -24,7 +24,7 @@ module "tls" {
 }
 
 module "dns" {
-  source      = "git::https://github.com/lhaig/terraform-dns-multicloud.git?ref=0.2.1"
+  source      = "github.com/lhaig/terraform-dns-multicloud"
   hosted-zone = var.hosted-zone
   # AWS_ACCESS_KEY_ID     = var.AWS_ACCESS_KEY_ID
   # AWS_SECRET_ACCESS_KEY = var.AWS_SECRET_ACCESS_KEY
@@ -87,8 +87,8 @@ module "aws_primarycluster" {
   cidr_blocks          = var.cidr_blocks
   instance_type_server = var.instance_type_server
   instance_type_worker = var.instance_type_worker
-   zone_id            = try(module.dns.aws_sub_zone_id[0],"Z01021311ZI5MRJSE45JX")
-  #  zone_id            = module.dns.aws_route53_zone.aws_sub_zone.*.zone_id[0]
+  # zone_id            = try(module.dns.aws_sub_zone_id[0],"Z01021311ZI5MRJSE45JX")
+   zone_id            = module.dns.aws_sub_zone_id[0]
   run_nomad_jobs        = var.run_nomad_jobs
   host_access_ip        = var.host_access_ip
   primary_datacenter    = var.primary_namespace

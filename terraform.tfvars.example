@@ -61,8 +61,8 @@ instance_type_worker = "t2.medium"
 public_key           = "ssh-rsa AAAAB"
 zone_id              = ""
 host_access_ip       = ""
-AWS_ACCESS_KEY_ID    = ""
-AWS_SECRET_ACCESS_KEY= ""
+# AWS_ACCESS_KEY_ID    = ""
+# AWS_SECRET_ACCESS_KEY= ""
 /*
 #####################
 #Azure
@@ -90,8 +90,8 @@ google_credentials = ""
 ###################
 TFE_DNS_WORKSPACE     = "Guy-DNS-Zone"
 hosted-zone           = "hashidemos.io"
-AWS_ACCESS_KEY_ID     = ""
-AWS_SECRET_ACCESS_KEY = ""
+# AWS_ACCESS_KEY_ID     = ""
+# AWS_SECRET_ACCESS_KEY = ""
 ARM_SUBSCRIPTION_ID   = "your subscription ID"
 ARM_TENANT_ID         = "your tenant ID"
 ARM_CLIENT_ID         = "your client ID"
