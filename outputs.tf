@@ -69,6 +69,8 @@ output "Primary_workers_Nodes" {
   value = module.aws_primarycluster.workers
 }
 
+
+
 output "DNS_aws_sub_zone_id" {
   value = module.dns.aws_sub_zone_id
 }

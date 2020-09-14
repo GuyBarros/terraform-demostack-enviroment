@@ -1,17 +1,16 @@
 
 //--------------------------EMEA-SE_PLAYGROUND-2019-----------------------------------------
 # Using a single workspace:
-/*
+
 terraform {
   backend "remote" {
     hostname     = "app.terraform.io"
-    organization = "emea-se-playground-2019"
+    organization = "GuyBarros"
     workspaces {
       name = "Guy-Demostack-V2"
     }
   }
 }
-*/
 
 module "tls" {
   source                = "git::https://github.com/GuyBarros/terraform-tls-certificate.git?ref=0.0.2"
@@ -24,15 +23,8 @@ module "tls" {
 }
 
 module "dns" {
-  source      = "github.com/lhaig/terraform-dns-multicloud"
+  source      = "github.com/GuyBarros/terraform-dns-multicloud"
   hosted-zone = var.hosted-zone
-  # AWS_ACCESS_KEY_ID     = var.AWS_ACCESS_KEY_ID
-  # AWS_SECRET_ACCESS_KEY = var.AWS_SECRET_ACCESS_KEY
-  # ARM_SUBSCRIPTION_ID   = var.ARM_SUBSCRIPTION_ID
-  # ARM_TENANT_ID         = var.ARM_TENANT_ID
-  # ARM_CLIENT_ID         = var.ARM_CLIENT_ID
-  # ARM_CLIENT_SECRET     = var.ARM_CLIENT_SECRET
-  # GOOGLE_CREDENTIALS    = var.GOOGLE_CREDENTIALS
   owner                 = var.owner
   namespace             = var.namespace
   created-by            = var.created-by
@@ -40,16 +32,17 @@ module "dns" {
   create_azure_dns_zone = var.create_azure_dns_zone
   create_gcp_dns_zone   = var.create_gcp_dns_zone
   gcp_project           = var.gcp_project
-  gcp_region            = var.gcp_region
 }
 
 
 provider "aws" {
+  version = ">= 1.20.0"
   region  = var.primary_region
   alias   = "primary"
 }
 
 provider "aws" {
+  version = ">= 1.20.0"
   region  = var.secondary_region
   alias   = "secondary"
 }
@@ -61,7 +54,8 @@ module "aws_primarycluster" {
     aws           = aws.primary
   }
    depends_on = [module.dns.aws_route53_zone, module.tls]
-  source               = "git::https://github.com/GuyBarros/terraform-aws-demostack.git//modules?ref=0.0.7"
+  source               = "./modules"
+  # source               = "git::https://github.com/GuyBarros/terraform-aws-demostack.git//modules?ref=0.0.7"
   owner                = var.owner
   region               = var.primary_region
   namespace            = var.primary_namespace
@@ -88,7 +82,7 @@ module "aws_primarycluster" {
   instance_type_server = var.instance_type_server
   instance_type_worker = var.instance_type_worker
   # zone_id            = try(module.dns.aws_sub_zone_id[0],"Z01021311ZI5MRJSE45JX")
-   zone_id            = module.dns.aws_sub_zone_id[0]
+   zone_id            = module.dns.aws_sub_zone_id
   run_nomad_jobs        = var.run_nomad_jobs
   host_access_ip        = var.host_access_ip
   primary_datacenter    = var.primary_namespace
